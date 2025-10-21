@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Anime Menu - Social Vibes</title>
+  <style>
+    :root{ --accent:#4caf50; --glass: rgba(255,255,255,0.04); }
+    *{box-sizing:border-box}
+    body{ margin:0; font-family:'Poppins',sans-serif; background: linear-gradient(135deg,#0b0b0d,#121215); color:#eee; min-height:100vh; }
+    nav{ display:flex; justify-content:space-between; align-items:center; padding:12px 18px; background:rgba(255,255,255,0.03); backdrop-filter: blur(8px); }
+    .logo{ display:flex; align-items:center; gap:12px; cursor:pointer; }
+    .logo img{ width:40px; height:40px; border-radius:8px; }
+    .menu a{ color:#ddd; margin-left:16px; text-decoration:none; font-weight:600; }
+    main{ padding:18px; }
+    h2{ color:#fff; margin:6px 0 10px 0; }
+    .anime-row{ display:flex; gap:18px; flex-wrap:wrap; justify-content:center; }
+    .anime-card{ width:220px; background:rgba(255,255,255,0.02); border-radius:14px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.6); cursor:pointer; position:relative; transition:transform .22s ease; }
+    .anime-card:hover{ transform:translateY(-8px); }
+    .anime-card img{ width:100%; height:280px; object-fit:cover; display:block; }
+    .anime-info{ position:absolute; bottom:0; left:0; width:100%; background:linear-gradient(180deg, transparent, rgba(0,0,0,0.75)); padding:12px; transform:translateY(100%); opacity:0; transition:all .35s ease; }
+    .anime-card.show-details .anime-info{ transform:translateY(0); opacity:1; }
+    .anime-info h3{ margin:0; color:#fff; font-size:1rem; }
+    .modal{ display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:9999; justify-content:center; align-items:center; flex-direction:column; }
+    .modal video{ width:92%; max-width:900px; border-radius:10px; }
+    .close-btn{ margin-top:16px; padding:10px 22px; border:none; background:#ff3b3b; color:#fff; border-radius:8px; cursor:pointer; }
+    @media (max-width:600px){ .anime-card{ width:90%; } .anime-card img{ height:200px; } }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="logo" onclick="window.location.href='index.html'">
+      <img src="logo.png" alt="App Logo" />
+      <span>Social Vibes</span>
+    </div>
+    <div class="menu">
+      <a href="index (1).html">Home</a>
+      <a href="index (2).html">Profile</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </div>
+  </nav>
+
+  <main>
+    <h2>Anime List</h2>
+    <p style="color:#bfbfbf;">Tap once to see info, double-tap to play video</p>
+
+    <div class="anime-row">
+      <div class="anime-card" data-video="Cutie.mp4">
+        <img src="fragrant.png" alt="The Fragrant Flower Blooms with Dignity" />
+        <div class="anime-info">
+          <h3>The Fragrant Flower Blooms with Dignity</h3>
+          <p style="margin:6px 0 0 0;color:#bbb;font-size:0.85rem;">A romantic anime about two students forming an unexpected bond.</p>
+        </div>
+      </div>
+
+      <div class="anime-card" data-video="horimiya.mp4">
+        <img src="horimiya.png" alt="Horimiya" />
+        <div class="anime-info">
+          <h3>Horimiya</h3>
+          <p style="margin:6px 0 0 0;color:#bbb;font-size:0.85rem;">Two high school students discover each other's hidden selves and fall in love.</p>
+        </div>
+      </div>
+
+      <div class="anime-card" data-video="darling.mp4">
+        <img src="darling.png" alt="Darling in the Franxx" />
+        <div class="anime-info">
+          <h3>Darling in the Franxx</h3>
+          <p style="margin:6px 0 0 0;color:#bbb;font-size:0.85rem;">Children pilot mechas to protect humanity from monstrous threats.</p>
+        </div>
+      </div>
+
+      <div class="anime-card" data-video="dan.mp4">
+        <img src="dan.png" alt="Dandadan" />
+        <div class="anime-info">
+          <h3>Dandadan</h3>
+          <p style="margin:6px 0 0 0;color:#bbb;font-size:0.85rem;">Two teens clash over ghosts and aliens, awakening hidden powers.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Video Modal -->
+  <div id="videoModal" class="modal">
+    <video id="videoPlayer" controls autoplay playsinline></video>
+    <button class="close-btn" onclick="closeVideo()">Back</button>
+  </div>
+
+  <script>
+    // require login
+    const current = localStorage.getItem('currentUser');
+    if (!current) { window.location.href = 'index.html'; }
+
+    function logout(){ localStorage.removeItem('currentUser'); window.location.href = 'index.html'; }
+
+    // Tap & double-tap
+    document.querySelectorAll(".anime-card").forEach((card) => {
+      let tapTimer = null;
+      card.addEventListener("click", () => {
+        if (tapTimer === null) {
+          tapTimer = setTimeout(() => {
+            toggleDetails(card);
+            tapTimer = null;
+          }, 260);
+        } else {
+          clearTimeout(tapTimer);
+          tapTimer = null;
+          playVideo(card.dataset.video);
+        }
+      });
+    });
+
+    function toggleDetails(card) {
+      const isOpen = card.classList.contains("show-details");
+      document.querySelectorAll(".anime-card").forEach(c => c.classList.remove("show-details"));
+      if (!isOpen) card.classList.add("show-details");
+    }
+
+    function playVideo(videoPath) {
+      const modal = document.getElementById("videoModal");
+      const player = document.getElementById("videoPlayer");
+      player.src = videoPath;
+      modal.style.display = "flex";
+      setTimeout(()=> { try{ if (player.requestFullscreen) player.requestFullscreen(); }catch(e){} }, 200);
+    }
+
+    function closeVideo() {
+      const modal = document.getElementById("videoModal");
+      const player = document.getElementById("videoPlayer");
+      player.pause();
+      player.src = "";
+      modal.style.display = "none";
+      if (document.fullscreenElement) document.exitFullscreen();
+    }
+  </script>
+</body>
+</html>

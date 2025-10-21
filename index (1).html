@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Social Vibes Hub</title>
+  <style>
+    :root{ --accent:#4caf50; --bg1:rgba(18,18,20,0.95); --glass: rgba(255,255,255,0.04); }
+    *{box-sizing:border-box}
+    body{ margin:0; font-family:'Poppins',sans-serif; background: linear-gradient(135deg,#0b0b0d,#121215); color:#e9e9e9; min-height:100vh; display:flex; flex-direction:column; }
+    nav{ display:flex; justify-content:space-between; align-items:center; padding:12px 20px; background:rgba(255,255,255,0.03); backdrop-filter: blur(8px); box-shadow:0 6px 22px rgba(0,0,0,0.6); }
+    .logo{ display:flex; align-items:center; gap:12px; cursor:pointer; }
+    .logo img{ width:42px; height:42px; border-radius:8px; object-fit:cover; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.6)); }
+    .logo span{ font-weight:700; color:#fff; }
+    .menu a { color:#cfcfcf; margin-left:18px; text-decoration:none; font-weight:600; }
+    .menu a:hover{ color:var(--accent); }
+    main{ flex:1; padding:36px 20px; display:flex; flex-direction:column; align-items:center; gap:20px; }
+    h2{ margin:0; color:#fff; }
+    .social-container{ display:flex; flex-wrap:wrap; gap:22px; justify-content:center; }
+    .icon{ background:var(--glass); padding:18px; border-radius:16px; width:96px; height:96px; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 8px 26px rgba(0,0,0,0.6); transition:transform .2s; }
+    .icon img{ width:100%; height:150%; object-fit:contain; filter:drop-shadow(0 6px 18px rgba(0,0,0,0.6)); }
+    .icon:hover{ transform:translateY(-6px) scale(1.03); }
+    footer{ padding:14px; text-align:center; color:#a9a9a9; font-size:13px; }
+    @media (max-width:600px){ .icon{ width:78px; height:78px; } nav{ flex-direction:column; gap:8px; } }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="logo" onclick="goToProfile()">
+      <img src="logo.png" alt="App Logo">
+      <span>Social Vibes</span>
+    </div>
+    <div class="menu">
+      <a href="index (3).html">Menu</a>
+      <a href="index (2).html">Profile</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </div>
+  </nav>
+
+  <main>
+    <h2>Connect with Your World</h2>
+
+    <div class="social-container">
+      <div class="icon" onclick="openSite('https://www.facebook.com/login/')">
+        <img src="facebook.png" alt="Facebook">
+      </div>
+
+      <div class="icon" onclick="openSite('https://twitter.com/login')">
+        <img src="x.png" alt="Twitter">
+      </div>
+
+      <div class="icon" onclick="openSite('https://www.instagram.com/accounts/login/')">
+        <img src="insta.png" alt="Instagram">
+      </div>
+
+      <div class="icon" onclick="openSite('https://www.tiktok.com/login')">
+        <img src="tiktok.png" alt="TikTok">
+      </div>
+
+      <div class="icon" onclick="openSite('https://accounts.google.com/signin')">
+        <img src="google.png" alt="Google">
+      </div>
+    </div>
+  </main>
+
+  <footer>Logged in as <span id="currentUserLabel">—</span></footer>
+
+  <script>
+    // check login
+    const currentUser = localStorage.getItem('currentUser');
+    if (!currentUser) {
+      // not logged in
+      window.location.href = "index.html";
+    } else {
+      // show username
+      document.getElementById('currentUserLabel').textContent = currentUser;
+      // ensure user object exists
+      if (!localStorage.getItem(currentUser)) {
+        // if not exist, remove currentUser and redirect to login
+        localStorage.removeItem('currentUser');
+        window.location.href = "index.html";
+      }
+    }
+
+    function openSite(url){ window.open(url,'_blank'); }
+    function logout(){ localStorage.removeItem('currentUser'); window.location.href = "index.html"; }
+    function goToProfile(){ window.location.href = "index (2).html"; }
+  </script>
+</body>
+</html>

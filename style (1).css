@@ -1,0 +1,107 @@
+body {
+  font-family: "Poppins", sans-serif;
+  background: linear-gradient(135deg, #0f0f0f, #1b1b1b);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.container {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  border-radius: 20px;
+  padding: 40px 30px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+  width: 90%;
+  max-width: 380px;
+  text-align: center;
+  transition: all 0.4s ease;
+}
+
+h2 {
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.input-box {
+  margin-bottom: 15px;
+}
+
+.input-box input,
+.input-box select {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  outline: none;
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.input-box input::placeholder {
+  color: #ccc;
+}
+
+.btn {
+  background: #ff3b3b;
+  color: #fff;
+  border: none;
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn:hover {
+  background: #ff6666;
+}
+
+#message {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #ff8080;
+}
+
+#message.success {
+  color: #7fff7f;
+}
+
+.toggle-link {
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+.toggle-link a {
+  color: #ff4c4c;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.toggle-link a:hover {
+  text-decoration: underline;
+}
+
+.verify-box {
+  margin-top: 10px;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.verify-box label {
+  font-size: 14px;
+  color: #ccc;
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 30px 20px;
+  }
+}

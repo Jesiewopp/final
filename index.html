@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login | Social Vibes</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #0b0b0d, #141416);
+      font-family: "Poppins", sans-serif;
+      color: #fff;
+      overflow: auto;
+    }
+    .container {
+      background: rgba(30,30,30,0.45);
+      backdrop-filter: blur(14px);
+      padding: 28px;
+      border-radius: 18px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+      width: 92%;
+      max-width: 420px;
+      position: relative;
+    }
+    h2 { text-align:center; margin-bottom:14px; color:#fff; }
+    .input-box { position: relative; margin-bottom:10px; }
+    .input-box input,
+    .input-box select { width:100%; padding:10px 40px 10px 12px; border-radius:10px; border:none; outline:none; background: rgba(255,255,255,0.04); color:#fff; font-size:14px; }
+    .input-box input::placeholder { color: #bfbfbf; }
+    .eye-toggle { position:absolute; right:10px; top:50%; transform:translateY(-50%); cursor:pointer; color:#bbb; font-size:18px; }
+    .remember-me { display:flex; align-items:center; gap:8px; margin-bottom:12px; }
+    .remember-me input { accent-color:#4caf50; width:16px; height:16px; cursor:pointer; }
+    .remember-me label { font-size:14px; color:#cfcfcf; cursor:pointer; }
+    .verify-box { display:flex; align-items:center; gap:10px; margin-top:10px; background: rgba(255,255,255,0.02); padding:8px 12px; border-radius:10px; }
+    .spinner { width:18px; height:18px; border:3px solid #666; border-top-color:#4caf50; border-radius:50%; animation: spin 0.9s linear infinite; display:none; }
+    @keyframes spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+    .verified-label { color:#4caf50; font-weight:600; }
+    .btn { width:100%; padding:11px; background:#4caf50; border:none; border-radius:10px; cursor:pointer; color:#fff; font-weight:600; font-size:15px; position:relative; overflow:hidden; }
+    .btn:hover { transform:scale(1.01); background:#43a047; }
+    .loading-spinner { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:20px; height:20px; border:3px solid rgba(255,255,255,0.25); border-top-color:white; border-radius:50%; animation: spin 1s linear infinite; display:none; }
+    .btn.loading .loading-spinner { display:block; }
+    .btn.loading span { visibility:hidden; }
+    .forgot-link { text-align:right; margin-top:6px; margin-bottom:12px; }
+    .forgot-link a { color:#4caf50; text-decoration:none; font-size:13px; }
+    .toggle-link p { text-align:center; margin-top:14px; font-size:14px; color:#d4d4d4; }
+    .toggle-link a { color:#4caf50; text-decoration:none; }
+    #message { color:#ff8080; text-align:center; margin-top:10px; font-size:14px; opacity:0; transition: opacity 0.35s ease; }
+    #message.show { opacity:1; }
+    #message.success { color:#7fff7f; }
+    .shake { animation: shake 0.4s ease; }
+    @keyframes shake {
+      0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}
+    }
+    /* small screens */
+    @media (max-width:420px){
+      .container{ padding:20px; border-radius:14px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="loginBox">
+    <h2 id="formTitle">Welcome to Social Vibes</h2>
+
+    <div class="input-box">
+      <input type="text" id="username" placeholder="Username" autocomplete="off">
+    </div>
+
+    <div class="input-box">
+      <input type="password" id="password" placeholder="Password" />
+      <svg class="eye-toggle" id="togglePassword" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+      </svg>
+    </div>
+
+    <div class="remember-me" id="rememberSection">
+      <input type="checkbox" id="rememberMe">
+      <label for="rememberMe">Remember Me</label>
+    </div>
+
+    <div class="forgot-link" id="forgotLink">
+      <a href="#" onclick="alert('Password reset not implemented in this demo.')">Forgot Password?</a>
+    </div>
+
+    <div id="registerFields" style="display:none;">
+      <div class="input-box"><input type="email" id="email" placeholder="Email Address"></div>
+      <div class="input-box"><input type="tel" id="mobile" placeholder="Mobile Number"></div>
+      <div class="input-box">
+        <select id="sex">
+          <option value="">Select Sex</option>
+          <option>Male</option><option>Female</option><option>Other</option>
+        </select>
+      </div>
+      <div class="input-box"><input type="number" id="age" placeholder="Age" min="1" max="120"></div>
+      <div class="input-box"><input type="date" id="birthdate"></div>
+      <div class="input-box"><input type="text" id="address" placeholder="Address"></div>
+
+      <div class="verify-box" id="verifyBox">
+        <input type="checkbox" id="notRobot">
+        <div class="spinner" id="spinner"></div>
+        <label for="notRobot" id="verifyLabel">I’m not a robot</label>
+      </div>
+    </div>
+
+    <button class="btn" id="actionBtn" onclick="handleForm()">
+      <span>Sign In</span>
+      <div class="loading-spinner"></div>
+    </button>
+
+    <div id="message"></div>
+
+    <div class="toggle-link">
+      <p id="toggleText">Don’t have an account? <a href="#" onclick="toggleRegister()">Register</a></p>
+    </div>
+  </div>
+
+  <script>
+    // state
+    let isRegister = false;
+    const usernameField = document.getElementById('username');
+    const passwordField = document.getElementById('password');
+    const rememberMe = document.getElementById('rememberMe');
+    const actionBtn = document.getElementById('actionBtn');
+    const spinner = document.getElementById('spinner');
+    const verifyCheckbox = document.getElementById('notRobot');
+    const verifyLabel = document.getElementById('verifyLabel');
+
+    // eye toggle
+    const togglePassword = document.getElementById('togglePassword');
+    togglePassword.addEventListener('click', () => {
+      const isHidden = passwordField.type === 'password';
+      passwordField.type = isHidden ? 'text' : 'password';
+      // swap simple icon (toggle visible/hidden stroke)
+      togglePassword.innerHTML = isHidden
+        ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.58 10.58A3 3 0 0113.42 13.42"/>'
+        : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>';
+    });
+
+    // load remembered
+    if (localStorage.getItem('rememberedUser')) {
+      usernameField.value = localStorage.getItem('rememberedUser');
+      rememberMe.checked = true;
+    }
+
+    // verify checkbox sim: show spinner then set label Verified
+    verifyCheckbox.addEventListener('change', () => {
+      if (!verifyCheckbox.checked) {
+        spinner.style.display = 'none';
+        verifyLabel.textContent = "I’m not a robot";
+        verifyLabel.classList.remove('verified-label');
+        return;
+      }
+      spinner.style.display = 'inline-block';
+      verifyLabel.textContent = "Verifying...";
+      setTimeout(() => {
+        spinner.style.display = 'none';
+        verifyLabel.textContent = "Verified ✓";
+        verifyLabel.classList.add('verified-label');
+      }, 1200);
+    });
+
+    function toggleRegister() {
+      isRegister = !isRegister;
+      const title = document.getElementById('formTitle');
+      const btnText = document.querySelector('.btn span');
+      const registerFields = document.getElementById('registerFields');
+      const rememberSection = document.getElementById('rememberSection');
+      const forgotLink = document.getElementById('forgotLink');
+      const toggleText = document.getElementById('toggleText');
+
+      if (isRegister) {
+        title.textContent = 'Create an Account';
+        btnText.textContent = 'Register';
+        registerFields.style.display = 'block';
+        rememberSection.style.display = 'none';
+        forgotLink.style.display = 'none';
+        toggleText.innerHTML = 'Already have an account? <a href="#" onclick="toggleRegister()">Log In</a>';
+      } else {
+        title.textContent = 'Welcome Back';
+        btnText.textContent = 'Sign In';
+        registerFields.style.display = 'none';
+        rememberSection.style.display = 'flex';
+        forgotLink.style.display = 'block';
+        toggleText.innerHTML = 'Don’t have an account? <a href="#" onclick="toggleRegister()">Register</a>';
+      }
+    }
+
+    function showMessage(text, success = false) {
+      const msg = document.getElementById('message');
+      msg.textContent = text;
+      msg.classList.add('show');
+      if (success) msg.classList.add('success'); else msg.classList.remove('success');
+      // remove later
+      setTimeout(()=> msg.classList.remove('show'), 2500);
+    }
+
+    function handleForm() {
+      const username = usernameField.value.trim();
+      const password = passwordField.value.trim();
+
+      if (!username || !password) {
+        showMessage('Please fill in all fields.');
+        flash();
+        return;
+      }
+
+      actionBtn.classList.add('loading');
+      // small visual delay
+      setTimeout(() => {
+        if (isRegister) {
+          // register flow
+          const email = document.getElementById('email').value.trim();
+          const mobile = document.getElementById('mobile').value.trim();
+          const sex = document.getElementById('sex').value.trim();
+          const age = document.getElementById('age').value.trim();
+          const birthdate = document.getElementById('birthdate').value.trim();
+          const address = document.getElementById('address').value.trim();
+          const verified = verifyLabel.textContent.includes('Verified');
+
+          if (!email || !mobile || !sex || !age || !birthdate || !address) {
+            actionBtn.classList.remove('loading');
+            showMessage('Please complete all fields.');
+            flash();
+            return;
+          }
+          if (!verified) {
+            actionBtn.classList.remove('loading');
+            showMessage('Please verify you’re not a robot.');
+            flash();
+            return;
+          }
+          if (localStorage.getItem(username)) {
+            actionBtn.classList.remove('loading');
+            showMessage('Username already exists.');
+            flash();
+            return;
+          }
+
+          // create user object with profile defaults
+          const user = {
+            username,
+            password,
+            email,
+            mobile,
+            info: { sex, age, birthdate, address },
+            profile: { avatar: '', bio: '' }
+          };
+          localStorage.setItem(username, JSON.stringify(user));
+          localStorage.setItem('currentUser', username);
+          if (rememberMe.checked) localStorage.setItem('rememberedUser', username);
+          else localStorage.removeItem('rememberedUser');
+
+          showMessage('Account created! Redirecting...', true);
+          setTimeout(() => { window.location.href = "index (2).html"; }, 900);
+        } else {
+          // login flow
+          const stored = localStorage.getItem(username);
+          if (!stored) {
+            actionBtn.classList.remove('loading');
+            showMessage('No account found.');
+            flash();
+            return;
+          }
+          const user = JSON.parse(stored);
+          if (user.password !== password) {
+            actionBtn.classList.remove('loading');
+            showMessage('Incorrect password.');
+            flash();
+            return;
+          }
+          // success
+          localStorage.setItem('currentUser', username);
+          if (rememberMe.checked) localStorage.setItem('rememberedUser', username);
+          else localStorage.removeItem('rememberedUser');
+
+          showMessage('Login successful! Redirecting...', true);
+          setTimeout(() => { window.location.href = "index(1).html"; }, 700);
+        }
+      }, 500);
+    }
+
+    function flash() {
+      const box = document.getElementById('loginBox');
+      box.classList.add('shake');
+      setTimeout(()=> box.classList.remove('shake'), 420);
+    }
+  </script>
+</body>
+</html>

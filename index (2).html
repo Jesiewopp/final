@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Your Profile - Social Vibes</title>
+  <style>
+    :root{ --accent:#4caf50; --glass: rgba(255,255,255,0.04); }
+    *{box-sizing:border-box}
+    body{ margin:0; font-family:'Poppins',sans-serif; background: linear-gradient(135deg,#0b0b0d,#121215); color:#eee; min-height:100vh; display:flex; flex-direction:column; }
+    nav{ display:flex; justify-content:space-between; align-items:center; padding:12px 18px; background:rgba(255,255,255,0.03); backdrop-filter: blur(8px); }
+    .logo{ display:flex; align-items:center; gap:12px; cursor:pointer; }
+    .logo img{ width:36px; height:36px; border-radius:8px; }
+    .menu a{ color:#dcdcdc; margin-left:16px; text-decoration:none; font-weight:600; }
+    .menu a:hover{ color:var(--accent); }
+    main{ padding:36px 20px; display:flex; flex-direction:column; align-items:center; gap:20px; }
+    #avatar-container{ position:relative; display:inline-flex; align-items:center; justify-content:center; gap:20px; }
+    #avatar{ width:140px; height:140px; border-radius:50%; border:3px solid rgba(255,255,255,0.06); object-fit:cover; background:linear-gradient(45deg,#111,#222); cursor:pointer; transition:transform .18s ease; }
+    #avatar:hover{ transform:scale(1.04); }
+    .avatar-menu{ display:none; flex-direction:column; position:absolute; right:-200px; top:45%; transform:translateY(-50%); background:rgba(255,255,255,0.06); border-radius:10px; box-shadow:0 6px 18px rgba(0,0,0,0.6); padding:6px 6px; opacity:0; transition:all .22s ease; z-index:50; }
+    .avatar-menu.show{ display:flex; opacity:1; right:-140px; }
+    .avatar-menu button{ background:none; border:none; padding:10px 14px; cursor:pointer; font-weight:600; color:white; border-radius:8px; }
+    .bio-section{ margin-top:10px; background:var(--glass); backdrop-filter: blur(8px); padding:18px 22px; border-radius:12px; min-width:260px; }
+    .bio-text{ font-size:1rem; color:#eaeaea; min-height:26px; cursor:pointer; }
+    .bio-text.placeholder{ color:rgba(230,230,230,0.6); font-style:italic; }
+    .modal{ display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); justify-content:center; align-items:center; z-index:200; flex-direction:column; }
+    .modal img{ width:80%; max-width:420px; border-radius:12px; }
+    .close-btn{ margin-top:16px; background:#ff3b3b; color:#fff; border:none; padding:8px 18px; border-radius:8px; cursor:pointer; }
+    input[type="file"]{ display:none; }
+    footer{ margin-top:auto; padding:14px; text-align:center; color:#a9a9a9; }
+    @media (max-width:768px){ .avatar-menu{ position:static; right:auto; transform:none; margin-top:10px; } }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="logo" onclick="window.location.href='index(1).html'">
+      <img src="logo.png" alt="App Logo" />
+      <span style="color:#fff;font-weight:700;">Social Vibes</span>
+    </div>
+    <div class="menu">
+      <a href="index(1).html">Home</a>
+      <a href="index (3).html">Menu</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </div>
+  </nav>
+
+  <main>
+    <h2 id="usernameDisplay">Your Profile</h2>
+
+    <div id="avatar-container">
+      <img id="avatar" src="default-avatar.png" alt="User Avatar" onclick="toggleAvatarMenu(event)">
+      <div class="avatar-menu" id="avatarMenu">
+        <button onclick="seeProfilePicture()">See Profile Picture</button>
+        <button onclick="chooseProfilePicture()">Choose Profile Picture</button>
+        <button onclick="removeProfilePicture()">Remove Profile Picture</button>
+      </div>
+    </div>
+
+    <input type="file" id="avatarUpload" accept="image/*">
+
+    <div class="bio-section">
+      <h3 style="margin:0 0 8px 0;">About Me</h3>
+      <div id="bioText" class="bio-text placeholder">Write about yourself...</div>
+    </div>
+  </main>
+
+  <div id="avatarModal" class="modal">
+    <img id="avatarPreview" src="" alt="Profile Picture">
+    <button class="close-btn" onclick="closeAvatarModal()">Close</button>
+  </div>
+
+
+  <script>
+    const defaultAvatar = 'default-avatar.png';
+    const currentUser = localStorage.getItem('currentUser');
+
+    if (!currentUser) {
+      window.location.href = 'index.html';
+    } else {
+      // fetch user
+      const raw = localStorage.getItem(currentUser);
+      if (!raw) {
+        localStorage.removeItem('currentUser');
+        window.location.href = 'index.html';
+      } else {
+        const user = JSON.parse(raw);
+        // ensure profile exists
+        if (!user.profile) user.profile = { avatar: '', bio: '' };
+        // username title
+        document.getElementById('usernameDisplay').textContent = user.username + "'s Profile";
+        // avatar
+        document.getElementById('avatar').src = user.profile.avatar && user.profile.avatar !== '' ? user.profile.avatar : defaultAvatar;
+
+        // bio
+        const bioText = document.getElementById('bioText');
+        if (user.profile.bio && user.profile.bio.trim() !== '') {
+          bioText.textContent = user.profile.bio;
+          bioText.classList.remove('placeholder');
+        }
+
+        // avatar upload handling
+        const uploadInput = document.getElementById('avatarUpload');
+        uploadInput.addEventListener('change', function(e){
+          const file = e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = function(ev){
+            document.getElementById('avatar').src = ev.target.result;
+            user.profile.avatar = ev.target.result;
+            localStorage.setItem(currentUser, JSON.stringify(user));
+          };
+          reader.readAsDataURL(file);
+        });
+
+        // bio editable
+        bioText.addEventListener('click', () => {
+          bioText.setAttribute('contenteditable','true');
+          bioText.classList.remove('placeholder');
+          if (bioText.textContent === 'Write about yourself...') bioText.textContent = '';
+          bioText.focus();
+        });
+        bioText.addEventListener('blur', () => {
+          bioText.setAttribute('contenteditable','false');
+          const newBio = bioText.textContent.trim();
+          if (!newBio) {
+            bioText.textContent = 'Write about yourself...';
+            bioText.classList.add('placeholder');
+            user.profile.bio = '';
+          } else {
+            user.profile.bio = newBio;
+          }
+          localStorage.setItem(currentUser, JSON.stringify(user));
+        });
+      }
+    }
+
+    function toggleAvatarMenu(e){
+      e.stopPropagation();
+      const menu = document.getElementById('avatarMenu');
+      menu.classList.toggle('show');
+    }
+    window.addEventListener('click', () => {
+      document.getElementById('avatarMenu').classList.remove('show');
+    });
+
+    function chooseProfilePicture(){ document.getElementById('avatarUpload').click(); }
+
+    function seeProfilePicture(){
+      const modal = document.getElementById('avatarModal');
+      const avatar = document.getElementById('avatar').src;
+      document.getElementById('avatarPreview').src = avatar;
+      modal.style.display = 'flex';
+      document.getElementById('avatarMenu').classList.remove('show');
+    }
+
+    function closeAvatarModal(){ document.getElementById('avatarModal').style.display = 'none'; }
+
+    function removeProfilePicture(){
+      const raw = localStorage.getItem(currentUser);
+      if (!raw) return;
+      const user = JSON.parse(raw);
+      user.profile.avatar = '';
+      localStorage.setItem(currentUser, JSON.stringify(user));
+      document.getElementById('avatar').src = defaultAvatar;
+      document.getElementById('avatarMenu').classList.remove('show');
+    }
+
+    function logout(){ localStorage.removeItem('currentUser'); window.location.href = 'index.html'; }
+  </script>
+</body>
+</html>
